@@ -1,0 +1,1 @@
+ALTER TABLE public.user_whatsapp_instances ADD COLUMN ordem integer DEFAULT 0;

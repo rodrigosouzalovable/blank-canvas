@@ -1,0 +1,1 @@
+ALTER TABLE public.whatsapp_mensagens ADD COLUMN whatsapp_msg_id TEXT;

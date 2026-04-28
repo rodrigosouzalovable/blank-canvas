@@ -1,0 +1,8 @@
+
+ALTER TABLE whatsapp_aquecimento_instancias
+DROP CONSTRAINT IF EXISTS whatsapp_aquecimento_instancias_ultimo_parceiro_id_fkey;
+
+ALTER TABLE whatsapp_aquecimento_instancias
+ADD CONSTRAINT whatsapp_aquecimento_instancias_ultimo_parceiro_id_fkey
+FOREIGN KEY (ultimo_parceiro_id) REFERENCES user_whatsapp_instances(id)
+ON DELETE SET NULL;

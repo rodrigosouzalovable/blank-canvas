@@ -1,0 +1,1 @@
+ALTER TABLE public.user_whatsapp_instances ADD COLUMN IF NOT EXISTS tipo VARCHAR(20) DEFAULT 'NORMAL';

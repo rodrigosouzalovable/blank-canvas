@@ -1,0 +1,1 @@
+ALTER TABLE public.acordos_devedor ADD COLUMN observacoes TEXT;

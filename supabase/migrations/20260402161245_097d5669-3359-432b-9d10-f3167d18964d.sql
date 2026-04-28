@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN sidebar_order jsonb DEFAULT NULL;

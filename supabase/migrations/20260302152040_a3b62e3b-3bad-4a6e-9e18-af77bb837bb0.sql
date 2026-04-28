@@ -1,0 +1,1 @@
+ALTER TABLE retornos ALTER COLUMN data_retorno TYPE timestamptz USING data_retorno::timestamptz;

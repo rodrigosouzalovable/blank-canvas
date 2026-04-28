@@ -1,0 +1,1 @@
+ALTER TABLE public.whatsapp_mensagens_rapidas ADD COLUMN arquivado boolean NOT NULL DEFAULT false;

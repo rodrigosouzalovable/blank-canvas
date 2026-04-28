@@ -1,0 +1,1 @@
+ALTER TABLE public.whatsapp_contatos ADD COLUMN fixado boolean NOT NULL DEFAULT false;

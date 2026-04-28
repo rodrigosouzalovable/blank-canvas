@@ -1,0 +1,1 @@
+ALTER TABLE whatsapp_fila ADD COLUMN cliente_nome text;

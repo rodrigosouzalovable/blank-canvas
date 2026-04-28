@@ -1,0 +1,1 @@
+UPDATE profiles SET whatsapp_lembretes_habilitado = false WHERE whatsapp_lembretes_habilitado = true;

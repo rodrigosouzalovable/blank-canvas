@@ -1,0 +1,1 @@
+ALTER TABLE public.lembrete_mensagens_templates ADD COLUMN audio_url text;

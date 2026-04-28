@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN ativo boolean NOT NULL DEFAULT true;

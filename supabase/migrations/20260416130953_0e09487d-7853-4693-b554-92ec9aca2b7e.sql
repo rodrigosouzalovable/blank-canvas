@@ -1,0 +1,1 @@
+ALTER TABLE public.user_permissions ADD COLUMN permite_cpf_duplicado boolean NOT NULL DEFAULT false;

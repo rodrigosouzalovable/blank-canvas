@@ -1,0 +1,1 @@
+ALTER TABLE user_whatsapp_instances ADD COLUMN ia_responde boolean NOT NULL DEFAULT false;

@@ -1,0 +1,1 @@
+ALTER TABLE user_whatsapp_instances ADD COLUMN apenas_lembretes boolean NOT NULL DEFAULT false;
