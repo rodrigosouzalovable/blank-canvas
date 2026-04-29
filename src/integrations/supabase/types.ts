@@ -2312,6 +2312,27 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_contatos_agenda_salvos: {
+        Row: {
+          instancia_id: string
+          nome_salvo: string | null
+          numero_destino: string
+          salvo_em: string
+        }
+        Insert: {
+          instancia_id: string
+          nome_salvo?: string | null
+          numero_destino: string
+          salvo_em?: string
+        }
+        Update: {
+          instancia_id?: string
+          nome_salvo?: string | null
+          numero_destino?: string
+          salvo_em?: string
+        }
+        Relationships: []
+      }
       whatsapp_conversas_auditoria: {
         Row: {
           created_at: string
@@ -2663,6 +2684,10 @@ export type Database = {
           valor_original: number
         }[]
       }
+      chatbot_append_buffer: {
+        Args: { p_telefone: string; p_texto: string; p_timestamp: string }
+        Returns: undefined
+      }
       comparativo_mensal_global: {
         Args: {
           p_fim_anterior: string
@@ -2726,6 +2751,7 @@ export type Database = {
         Args: { user_id: string }
         Returns: string
       }
+      get_table_ddl: { Args: { p_table: string }; Returns: string }
       has_inbox_compartilhado: { Args: { user_id: string }; Returns: boolean }
       has_role:
         | {

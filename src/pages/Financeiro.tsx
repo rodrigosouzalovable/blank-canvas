@@ -360,7 +360,8 @@ export default function Financeiro() {
 
   const updateGastoFuncionarioMutation = useMutation({
     mutationFn: async ({ id, ...gasto }: Partial<GastoFuncionario> & { id: string }) => {
-      const { error } = await supabase.from('gastos_funcionarios').update(gasto).eq('id', id);
+      const { profiles, ...payload } = gasto as any;
+      const { error } = await supabase.from('gastos_funcionarios').update(payload).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
