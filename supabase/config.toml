@@ -1,1 +1,115 @@
 project_id = "snuktxleeunjbzvbvmad"
+
+[functions.reset-user-password]
+verify_jwt = false
+
+[functions.transcribe-audio]
+verify_jwt = false
+
+[functions.send-whatsapp]
+verify_jwt = false
+
+[functions.check-payment-reminders]
+verify_jwt = false
+
+[functions.process-whatsapp-queue]
+verify_jwt = false
+
+[functions.create-user-admin]
+verify_jwt = false
+
+[functions.daily-report-whatsapp]
+verify_jwt = false
+
+[functions.extract-acordo-data]
+verify_jwt = false
+
+[functions.cleanup-acordos]
+verify_jwt = false
+
+[functions.consultar-indices]
+verify_jwt = false
+
+[functions.gerar-termo-acordo]
+verify_jwt = false
+
+[functions.credor-dashboard-data]
+verify_jwt = false
+
+[functions.credor-report-whatsapp]
+verify_jwt = false
+
+[functions.gerar-estrategia-cobranca]
+verify_jwt = false
+
+[functions.notify-cpf-consulta]
+verify_jwt = false
+
+[functions.extract-pdf-acordo]
+verify_jwt = false
+
+[functions.delete-user-admin]
+verify_jwt = false
+
+[functions.whatsapp-chatbot]
+verify_jwt = false
+
+[functions.automacao-cobmais]
+verify_jwt = false
+
+[functions.analyze-cobmais-screen]
+verify_jwt = false
+
+[functions.process-cobmais-video]
+verify_jwt = false
+
+[functions.chat-cobmais-knowledge]
+verify_jwt = false
+
+[functions.teach-chatbot]
+verify_jwt = false
+
+[functions.whatsapp-qr]
+verify_jwt = false
+
+[functions.process-pos-atendimento]
+verify_jwt = false
+
+[functions.send-whatsapp-audio]
+verify_jwt = false
+
+[functions.voice-campaign-call]
+verify_jwt = false
+
+[functions.whatsapp-aquecimento]
+verify_jwt = false
+
+[functions.send-whatsapp-media]
+verify_jwt = false
+
+[functions.cleanup-inbox-media]
+verify_jwt = false
+
+[functions.daily-report-aquecimento]
+verify_jwt = false
+
+[functions.whatsapp-ia-responder]
+verify_jwt = false
+
+[functions.process-acionamento-agendado]
+verify_jwt = false
+
+[functions.check-whatsapp-numbers]
+verify_jwt = false
+
+[functions.process-import-job]
+verify_jwt = false
+
+[functions.add-to-warming-group]
+verify_jwt = false
+
+[functions.aquecimento-envio-autosave]
+verify_jwt = false
+
+[functions.daily-report-advanced]
+verify_jwt = false
