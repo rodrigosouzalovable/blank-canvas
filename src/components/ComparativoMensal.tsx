@@ -1,8 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatarMoeda } from '@/lib/comissao';
-import { TrendingUp, TrendingDown, Minus, BarChart3, ArrowRight } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
+import { TrendingUp, TrendingDown, Minus, BarChart3 } from 'lucide-react';
 
 interface ComparativoData {
   acordosCriados: number;
@@ -79,8 +78,6 @@ function LinhaComparativa({
         <span className="text-sm font-semibold text-foreground">{label}</span>
         <VariacaoBadge atual={atual} anterior={anterior} />
       </div>
-
-      {/* Mês Anterior */}
       <div className="space-y-1">
         <div className="flex items-center justify-between text-xs">
           <span className="text-muted-foreground">Mês anterior</span>
@@ -93,8 +90,6 @@ function LinhaComparativa({
           />
         </div>
       </div>
-
-      {/* Mês Atual */}
       <div className="space-y-1">
         <div className="flex items-center justify-between text-xs">
           <span className="text-foreground font-medium">Mês atual</span>
@@ -123,28 +118,10 @@ export function ComparativoMensal({ data, diaAtual }: Props) {
       </CardHeader>
       <CardContent>
         <div className="grid gap-4 md:grid-cols-2">
-          <LinhaComparativa
-            label="Acordos Criados"
-            anterior={data.acordosCriadosAnterior}
-            atual={data.acordosCriados}
-          />
-          <LinhaComparativa
-            label="Valor dos Acordos"
-            anterior={data.valorAcordosAnterior}
-            atual={data.valorAcordos}
-            isCurrency
-          />
-          <LinhaComparativa
-            label="Pagamentos Recebidos"
-            anterior={data.pagamentosRecebidosAnterior}
-            atual={data.pagamentosRecebidos}
-          />
-          <LinhaComparativa
-            label="Valor Recebido"
-            anterior={data.valorRecebidoAnterior}
-            atual={data.valorRecebido}
-            isCurrency
-          />
+          <LinhaComparativa label="Acordos Criados" anterior={data.acordosCriadosAnterior} atual={data.acordosCriados} />
+          <LinhaComparativa label="Valor dos Acordos" anterior={data.valorAcordosAnterior} atual={data.valorAcordos} isCurrency />
+          <LinhaComparativa label="Pagamentos Recebidos" anterior={data.pagamentosRecebidosAnterior} atual={data.pagamentosRecebidos} />
+          <LinhaComparativa label="Valor Recebido" anterior={data.valorRecebidoAnterior} atual={data.valorRecebido} isCurrency />
         </div>
       </CardContent>
     </Card>
