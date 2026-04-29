@@ -1053,7 +1053,15 @@ export type Database = {
           user_id?: string
           valor?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "gastos_funcionarios_funcionario_id_fkey"
+            columns: ["funcionario_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       grupo_empresarial_membros: {
         Row: {
@@ -1362,7 +1370,15 @@ export type Database = {
           status?: string
           valor_parcela?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "pagamentos_acordo_id_fkey"
+            columns: ["acordo_id"]
+            isOneToOne: false
+            referencedRelation: "acordos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       parcelas_devedor: {
         Row: {
@@ -2631,6 +2647,81 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      buscar_devedores_por_documento: {
+        Args: { p_credor?: string; p_doc: string }
+        Returns: {
+          contrato: string
+          cpf: string
+          credor: string
+          data_vencimento: string
+          descricao: string
+          estagio: string
+          id: string
+          nome: string
+          telefone: string
+          valor_atualizado: number
+          valor_original: number
+        }[]
+      }
+      comparativo_mensal_global: {
+        Args: {
+          p_fim_anterior: string
+          p_fim_atual: string
+          p_inicio_anterior: string
+          p_inicio_atual: string
+        }
+        Returns: Json
+      }
+      consultar_acordo_ativo_por_cpf: {
+        Args: { p_cpf: string }
+        Returns: {
+          acordo_criado_em: string
+          acordo_status: string
+          funcionario_nome: string
+        }[]
+      }
+      consultar_debitos_por_cpf: {
+        Args: { p_cpf: string }
+        Returns: {
+          contrato: string
+          cpf: string
+          credor: string
+          data_vencimento: string
+          descricao: string
+          id: string
+          nome: string
+          valor_atualizado: number
+          valor_original: number
+        }[]
+      }
+      consultar_parcelas_acordo_por_cpf: {
+        Args: { p_cpf: string }
+        Returns: {
+          data_paga: string
+          data_prevista: string
+          numero_parcela: number
+          status: string
+          total_parcelas: number
+          valor_parcela: number
+          valor_total_acordo: number
+        }[]
+      }
+      contar_acordos_hoje_por_usuario: {
+        Args: { p_user_id?: string }
+        Returns: number
+      }
+      cpf_acordo_funcionario_nome: { Args: { p_cpf: string }; Returns: string }
+      cpf_has_acordo: { Args: { p_cpf: string }; Returns: boolean }
+      cpf_normalize: { Args: { cpf_input: string }; Returns: string }
+      cpf_ultimo_acordo_quebrado: { Args: { p_cpf: string }; Returns: boolean }
+      delete_acordo_atomico: {
+        Args: { p_acordo_id: string }
+        Returns: undefined
+      }
+      delete_importacao_em_lotes: {
+        Args: { p_importacao_id: string }
+        Returns: Json
+      }
       get_acordos_compartilhados_admin: {
         Args: { user_id: string }
         Returns: string
@@ -2646,13 +2737,51 @@ export type Database = {
           }
         | { Args: { role_name: string; user_id: string }; Returns: boolean }
       is_admin_user: { Args: { user_id: string }; Returns: boolean }
+      listar_credores_distintos: {
+        Args: never
+        Returns: {
+          credor: string
+        }[]
+      }
+      listar_devedores_por_credor: {
+        Args: { p_credor: string }
+        Returns: {
+          contrato: string
+          cpf: string
+          credor: string
+          data_vencimento: string
+          descricao: string
+          estagio: string
+          id: string
+          nome: string
+          telefone: string
+          tem_acordo: boolean
+          valor_atualizado: number
+          valor_original: number
+        }[]
+      }
+      listar_funcionarios: {
+        Args: never
+        Returns: {
+          nome: string
+          user_id: string
+        }[]
+      }
       owns_whatsapp_instance: {
         Args: { instancia_id: string }
         Returns: boolean
       }
+      ranking_mensal: {
+        Args: { p_mes_ano?: string }
+        Returns: {
+          nome: string
+          total_recebido: number
+          user_id: string
+        }[]
+      }
     }
     Enums: {
-      app_role: "admin" | "funcionario"
+      app_role: "admin" | "funcionario" | "gestor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2780,7 +2909,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "funcionario"],
+      app_role: ["admin", "funcionario", "gestor"],
     },
   },
 } as const
