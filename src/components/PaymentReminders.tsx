@@ -64,6 +64,7 @@ export function PaymentReminders() {
   const [maxDelay, setMaxDelay] = useState(15);
   const [tipoEnvio, setTipoEnvio] = useState<'texto' | 'audio' | 'audio_botoes'>('texto');
 
+  // WhatsApp instances
   const [instances, setInstances] = useState<WhatsAppInstance[]>([]);
   const [selectedInstanceIds, setSelectedInstanceIds] = useState<string[]>(() => {
     try {
@@ -73,9 +74,11 @@ export function PaymentReminders() {
   });
   const roundRobinRef = useRef(0);
 
+  // Templates & operator
   const [templates, setTemplates] = useState<LembreteTemplate[]>([]);
   const [operadorNome, setOperadorNome] = useState('');
 
+  // Fila items for status checking from DB
   const [filaItems, setFilaItems] = useState<{ id: string; pagamento_id: string; telefone: string; status: string | null }[]>([]);
 
   const selectedInstances = instances.filter(i => selectedInstanceIds.includes(i.id));
@@ -91,6 +94,7 @@ export function PaymentReminders() {
   const totalLembretes = lembretesVencidos.length + lembretesHoje.length + lembretesTresDias.length;
   const allPendingReminders = [...lembretesHoje, ...lembretesVencidos, ...lembretesTresDias];
 
+  // Fetch instances, templates, operator name when dialog opens
   useEffect(() => {
     if (!dialogOpen || !user) return;
     const adminId = acordosCompartilhados && concedidoPor ? concedidoPor : null;
@@ -131,10 +135,12 @@ export function PaymentReminders() {
         const primeiro = profileRes.data.nome?.split(' ')[0] || '';
         setOperadorNome(primeiro.charAt(0).toUpperCase() + primeiro.slice(1).toLowerCase());
       }
+      // Also reload saved progress
       loadSavedProgress();
     })();
   }, [dialogOpen, user]);
 
+  // Fetch fila items
   const fetchFila = useCallback(async () => {
     if (selectedInstances.length === 0) { setFilaItems([]); return; }
     const hoje = new Date();
@@ -151,10 +157,12 @@ export function PaymentReminders() {
 
   useEffect(() => { if (dialogOpen) fetchFila(); }, [dialogOpen, fetchFila]);
 
+  // Get WhatsApp status for a reminder - check context statusMap first, then DB fila, then saved progress
   const getWhatsAppStatus = (reminderId: string, telefone?: string): string => {
     if (reminderId === currentSendingId) return 'enviando';
     if (statusMap[reminderId]) return statusMap[reminderId];
 
+    // Check saved progress from DB
     const savedItem = envioProgresso.find(p => p.pagamento_id === reminderId);
     if (savedItem) {
       if (savedItem.status === 'enviado') return 'enviado';
@@ -162,6 +170,7 @@ export function PaymentReminders() {
       return 'pendente';
     }
 
+    // Check fila items
     const rPhone = normalizePhone(telefone || '');
     const match = filaItems.find(f => {
       if (f.pagamento_id === reminderId) return true;
@@ -176,6 +185,7 @@ export function PaymentReminders() {
     return 'nao_enviado';
   };
 
+  // Compute progress
   const enviadosCount = allPendingReminders.filter(r => getWhatsAppStatus(r.id, r.cliente_telefone) === 'enviado').length;
   const errosCount = allPendingReminders.filter(r => getWhatsAppStatus(r.id, r.cliente_telefone) === 'erro').length;
   const enviadosHoje = lembretesHoje.filter(r => getWhatsAppStatus(r.id, r.cliente_telefone) === 'enviado').length;
@@ -184,6 +194,7 @@ export function PaymentReminders() {
   const naoEnviadosCount = allPendingReminders.filter(r => getWhatsAppStatus(r.id, r.cliente_telefone) === 'nao_enviado').length;
   const progressPercent = allPendingReminders.length > 0 ? Math.round(((enviadosCount + errosCount) / allPendingReminders.length) * 100) : 0;
 
+  // Get last sent time from saved progress
   const ultimoEnvio = envioProgresso
     .filter(p => p.status === 'enviado' && p.enviado_em)
     .sort((a, b) => new Date(b.enviado_em!).getTime() - new Date(a.enviado_em!).getTime())[0];
@@ -357,6 +368,7 @@ export function PaymentReminders() {
                     toast.error('Selecione uma instância WhatsApp primeiro');
                     return;
                   }
+                  // Find the audio_url for this reminder type
                   const tipoKey = lembrete.tipo === 'hoje' ? 'dia_vencimento'
                     : lembrete.tipo === 'tres_dias' ? '3_dias'
                     : (() => {
@@ -457,6 +469,7 @@ export function PaymentReminders() {
                   roundRobinRef.current += 1;
                   (async () => {
                     try {
+                      // 1. Send audio
                       const audioRes = await supabase.functions.invoke('send-whatsapp-audio', {
                         body: {
                           telefone: lembrete.cliente_telefone,
@@ -473,8 +486,10 @@ export function PaymentReminders() {
                         return;
                       }
 
+                      // 2. Wait 3 seconds
                       await new Promise(r => setTimeout(r, 3000));
 
+                      // 3. Replace variables in botoes_texto
                       const primeiroNome = lembrete.cliente_nome?.split(' ')[0] || '';
                       const nomeFormatado = primeiroNome.charAt(0).toUpperCase() + primeiroNome.slice(1).toLowerCase();
                       const nomeCompleto = (lembrete.cliente_nome || '').split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
@@ -489,6 +504,7 @@ export function PaymentReminders() {
                         .replace(/{data_vencimento}/g, new Date(lembrete.data_prevista + 'T00:00:00').toLocaleDateString('pt-BR'))
                         .replace(/{dias_atraso}/g, String(diasAtraso));
 
+                      // 4. Send buttons
                       const btnRes = await supabase.functions.invoke('send-whatsapp-buttons', {
                         body: {
                           telefone: lembrete.cliente_telefone,
@@ -760,6 +776,7 @@ export function PaymentReminders() {
 
           <div className="min-h-0 overflow-y-auto overflow-x-hidden scrollbar-thin pr-1">
             <div className="space-y-4">
+              {/* WhatsApp instance selector + send button */}
               <div className="border rounded-lg p-3 bg-muted/30 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">WhatsApp</span>
@@ -811,6 +828,7 @@ export function PaymentReminders() {
                   )}
                 </div>
 
+                {/* Tipo de envio */}
                 <div className="flex items-center gap-4 pt-1">
                   <span className="text-xs font-medium text-muted-foreground">Tipo de envio:</span>
                   <RadioGroup
@@ -840,6 +858,7 @@ export function PaymentReminders() {
                   </RadioGroup>
                 </div>
 
+                {/* Intervalo de delay */}
                 <div className="flex items-center gap-3 pt-1">
                   <span className="text-xs font-medium text-muted-foreground">Intervalo:</span>
                   <div className="flex items-center gap-1.5">
@@ -878,6 +897,7 @@ export function PaymentReminders() {
                 </div>
               </div>
 
+              {/* Progress bar + last sent info */}
               {(isSending || enviadosCount > 0 || errosCount > 0) && (
                 <div className="space-y-1">
                   <Progress value={progressPercent} className="h-2" />

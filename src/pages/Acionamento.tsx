@@ -24,7 +24,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useAutoSend } from '@/hooks/useAutoSend';
 import type { UazapiInstance } from '@/hooks/useAutoSend';
-import { Upload, Save, Check, X, Loader2, Trash2, FileSpreadsheet, Play, Square, Settings, Wifi, WifiOff, Send, Plus, Pencil, Target, AlertTriangle, RefreshCw, Bot, MessageCircle, Copy, Calculator, Clock, CalendarClock, Download } from 'lucide-react';
+import { Upload, Save, Check, X, Loader2, Trash2, FileSpreadsheet, Play, Square, Settings, Wifi, WifiOff, Send, Plus, Pencil, Target, AlertTriangle, RefreshCw, Bot, MessageCircle, Copy, Calculator, Clock, CalendarClock, Download, Power } from 'lucide-react';
 import { exportarParaExcel } from '@/lib/exportExcel';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -466,27 +466,11 @@ export default function Acionamento() {
       }
     }));
 
-    // Sync ativo flag in database based on real connection status
-    for (const result of results) {
-      const inst = activeOnes.find(i => i.id === result.id);
-      if (!inst) continue;
-      if (!result.connected && inst.ativo) {
-        await supabase.from('user_whatsapp_instances' as any).update({ ativo: false } as any).eq('id', result.id);
-      }
-    }
-    // Also re-activate instances that were marked inactive but are now connected
-    const inactiveOnes = instancesToCheck.filter(i => !i.ativo);
-    for (const inst of inactiveOnes) {
-      try {
-        const { data } = await supabase.functions.invoke('test-uazapi-connection', {
-          body: { server_url: inst.server_url, instance_token: inst.instance_token }
-        });
-        if (data?.ok && data?.data?.status?.connected === true) {
-          await supabase.from('user_whatsapp_instances' as any).update({ ativo: true } as any).eq('id', inst.id);
-          setConnectionStatus(prev => ({ ...prev, [inst.id]: 'connected' }));
-        }
-      } catch {}
-    }
+    // NOTE: Não desativamos/reativamos automaticamente o flag `ativo` no banco com
+    // base no status de conexão da UAZAPI. Falhas temporárias de rede ou da própria
+    // UAZAPI estavam derrubando dezenas de chips de uma vez. O ícone Wi-Fi (em
+    // memória, via connectionStatus) já reflete o status real; o flag `ativo` agora
+    // é controlado **apenas manualmente** (toggle individual ou botão "Ativar todas").
     setCheckingConnections(false);
   }, []);
 
@@ -1702,6 +1686,30 @@ export default function Acionamento() {
     setInstances(prev => prev.map(i => i.id === id ? { ...i, ativo } : i));
   };
 
+  const [ativandoTodas, setAtivandoTodas] = useState(false);
+  const handleAtivarTodasInstancias = async () => {
+    const inativas = instances.filter(i => !i.ativo);
+    if (inativas.length === 0) {
+      toast.info('Todas as instâncias já estão ativas.');
+      return;
+    }
+    if (!confirm(`Marcar ${inativas.length} instância(s) inativa(s) como ATIVA(S)?\n\nIsso não reconecta a UAZAPI — apenas habilita o uso pelo sistema.`)) return;
+    setAtivandoTodas(true);
+    const ids = inativas.map(i => i.id);
+    const { error } = await supabase
+      .from('user_whatsapp_instances' as any)
+      .update({ ativo: true } as any)
+      .in('id', ids);
+    if (error) {
+      toast.error(`Erro ao ativar: ${error.message}`);
+      setAtivandoTodas(false);
+      return;
+    }
+    setInstances(prev => prev.map(i => ids.includes(i.id) ? { ...i, ativo: true } : i));
+    toast.success(`${inativas.length} instância(s) ativada(s).`);
+    setAtivandoTodas(false);
+  };
+
   const handleToggleApenasLembretes = async (id: string, apenas_lembretes: boolean) => {
     const updateData: any = { apenas_lembretes };
     if (apenas_lembretes) { updateData.robo = false; updateData.ia_responde = false; }
@@ -2426,6 +2434,16 @@ export default function Acionamento() {
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2 lg:shrink-0">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleAtivarTodasInstancias}
+                      disabled={ativandoTodas || instances.every(i => i.ativo)}
+                      title="Marca todas as instâncias inativas como ativas (não reconecta a UAZAPI)"
+                    >
+                      {ativandoTodas ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Power className="h-4 w-4 mr-1" />}
+                      Ativar todas
+                    </Button>
                     <Button
                       size="sm"
                       onClick={() => { setConnectMethod('qr'); handleConnectQr(); }}
