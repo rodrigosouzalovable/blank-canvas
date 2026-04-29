@@ -1053,7 +1053,15 @@ export type Database = {
           user_id?: string
           valor?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "gastos_funcionarios_funcionario_id_fkey"
+            columns: ["funcionario_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       grupo_empresarial_membros: {
         Row: {
@@ -1362,7 +1370,15 @@ export type Database = {
           status?: string
           valor_parcela?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "pagamentos_acordo_id_fkey"
+            columns: ["acordo_id"]
+            isOneToOne: false
+            referencedRelation: "acordos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       parcelas_devedor: {
         Row: {
