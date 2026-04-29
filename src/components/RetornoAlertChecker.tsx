@@ -31,12 +31,9 @@ export function RetornoAlertChecker() {
     if (!user) return;
 
     const now = new Date();
-    // Build UTC-based window: compare against UTC times since DB stores as UTC
     const past5Min = new Date(now.getTime() - 5 * 60 * 1000);
     const in2Min = new Date(now.getTime() + 2 * 60 * 1000);
 
-    // We need to compare in "user local time" because the user entered local time 
-    // but it was stored as UTC. So we shift the window by the timezone offset.
     const offsetMs = now.getTimezoneOffset() * 60 * 1000;
     const past5MinUtc = new Date(past5Min.getTime() + offsetMs);
     const in2MinUtc = new Date(in2Min.getTime() + offsetMs);
@@ -51,14 +48,12 @@ export function RetornoAlertChecker() {
 
     if (error || !data || data.length === 0) return;
 
-    // Find first non-notified retorno
     const retorno = data.find(r => !notifiedIds.current.has(r.id));
     if (!retorno) return;
 
     notifiedIds.current.add(retorno.id);
     setAlertaRetorno(retorno);
 
-    // Play sound
     try {
       const audio = new Audio(successSound);
       await audio.play();
@@ -71,10 +66,7 @@ export function RetornoAlertChecker() {
 
   useEffect(() => {
     if (!user) return;
-
-    // Check immediately
     checkRetornos();
-
     const interval = setInterval(checkRetornos, 30000);
     return () => clearInterval(interval);
   }, [user, checkRetornos]);
